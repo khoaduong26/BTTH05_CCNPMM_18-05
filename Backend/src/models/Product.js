@@ -11,6 +11,7 @@ const productSchema = new mongoose.Schema(
     imageUrls: [{ type: String, trim: true }],
     stockQuantity: { type: Number, default: 0, min: 0 },
     soldQuantity: { type: Number, default: 0, min: 0 },
+    viewCount: { type: Number, default: 0, min: 0 },
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
     isActive: { type: Boolean, default: true },
     tags: [{ type: String, trim: true }]

@@ -62,6 +62,20 @@ const getBestSellingProducts = async (req, res) => {
   }
 };
 
+const getMostViewedProducts = async (req, res) => {
+  try {
+    const limit = Number(req.query.limit ?? 10);
+    const items = await catalogService.getMostViewedProducts(limit);
+    return res.status(200).json({ items });
+  } catch (error) {
+    logControllerError('getMostViewedProducts', error);
+    return res.status(500).json({
+      message: `Failed to load most viewed products: ${error.message}`,
+      operation: 'getMostViewedProducts'
+    });
+  }
+};
+
 const getPromotionProducts = async (req, res) => {
   try {
     const limit = Number(req.query.limit ?? 8);
@@ -123,5 +137,6 @@ module.exports = {
   getBestSellingProducts,
   getPromotionProducts,
   getProductDetail,
-  uploadProductImages
+  uploadProductImages,
+  getMostViewedProducts
 };

@@ -23,6 +23,7 @@ router.get('/categories', catalogController.getCategories);
 router.get('/products', catalogController.getProducts);
 router.get('/products/latest', catalogController.getLatestProducts);
 router.get('/products/best-sellers', catalogController.getBestSellingProducts);
+router.get('/products/most-viewed', catalogController.getMostViewedProducts);
 router.get('/products/promotions', catalogController.getPromotionProducts);
 router.get('/products/:id', catalogController.getProductDetail);
 router.post(

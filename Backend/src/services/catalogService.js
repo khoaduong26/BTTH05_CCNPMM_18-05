@@ -2,11 +2,11 @@ const Product = require('../models/Product');
 const Category = require('../models/Category');
 const Discount = require('../models/Discount');
 const mongoose = require('mongoose');
+
 const normalizeNumber = (value, fallback) => {
   if (value === undefined || value === null || value === '') {
     return fallback;
   }
-
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
@@ -15,7 +15,6 @@ const buildSearchFilter = ({ search }) => {
   if (!search) {
     return {};
   }
-
   const regex = new RegExp(search, 'i');
   return {
     $or: [{ name: regex }, { description: regex }]
@@ -137,13 +136,22 @@ const getLatestProducts = async (limit = 8) => {
   return items.map((item) => item.toJSON());
 };
 
-const getBestSellingProducts = async (limit = 8) => {
+const getBestSellingProducts = async (limit = 10) => {
   const items = await Product.find({ isActive: true })
     .populate('category')
     .sort({ soldQuantity: -1, createdAt: -1 })
     .limit(limit);
   return items.map((item) => item.toJSON());
 };
+
+const getMostViewedProducts = async (limit = 10) => {
+  const items = await Product.find({ isActive: true })
+    .populate('category')
+    .sort({ viewCount: -1, createdAt: -1 }) 
+    .limit(limit);
+  return items.map((item) => item.toJSON());
+};
+
 
 const getPromotionProducts = async (limit = 8) => {
   const now = new Date();
@@ -170,27 +178,19 @@ const getPromotionProducts = async (limit = 8) => {
 };
 
 const getProductById = async (idOrSlug) => {
-  // LOG 1: Xem Frontend đang gửi chuỗi gì lên
-  console.log('====== DEBUG GET PRODUCT ======');
-  console.log('>>> Tham số nhận vào idOrSlug:', idOrSlug);
-
   const isObjectId = mongoose.Types.ObjectId.isValid(idOrSlug);
   const query = isObjectId ? { _id: idOrSlug } : { slug: idOrSlug };
   
-  // LOG 2: Xem câu lệnh tìm kiếm thực tế là gì
-  console.log('>>> Câu lệnh Query tạo ra:', query);
-
-  const product = await Product.findOne(query).populate('category');
+  // Dùng findOneAndUpdate để cộng view an toàn. (ĐÃ XÓA LỆNH SAVE CŨ BÊN DƯỚI)
+  const product = await Product.findOneAndUpdate(
+    query,
+    { $inc: { viewCount: 1 } },
+    { new: true } 
+  ).populate('category');
   
   if (!product) {
-    // LOG 3: Nếu không tìm thấy bản ghi nào trong DB
-    console.log('>>> KẾT QUẢ: Không tìm thấy sản phẩm nào trong Database!');
-    console.log('================================');
     return null;
   }
-
-  console.log('>>> KẾT QUẢ: Tìm thấy sản phẩm:', product.name);
-  console.log('================================');
 
   const now = new Date();
   const discount = await Discount.findOne({
@@ -226,5 +226,6 @@ module.exports = {
   getBestSellingProducts,
   getPromotionProducts,
   getProductById,
-  getRelatedProducts
+  getRelatedProducts,
+  getMostViewedProducts
 };
