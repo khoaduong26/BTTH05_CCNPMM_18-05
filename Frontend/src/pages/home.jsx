@@ -7,12 +7,14 @@ import FilterPanel from '../components/shop/FilterPanel';
 import CategoryStrip from '../components/shop/CategoryStrip';
 import ShopFooter from '../components/shop/ShopFooter';
 import Pagination from '../components/shop/Pagination';
+import ProductCarousel from '../components/shop/ProductCarousel';
 import {
   fetchBestSellingProducts,
   fetchCategories,
   fetchLatestProducts,
   fetchProducts,
-  fetchPromotionProducts
+  fetchPromotionProducts,
+  fetchMostViewedProducts
 } from '../util/catalog.api';
 
 const debounce = (fn, delay = 400) => {
@@ -29,9 +31,10 @@ const HomePage = () => {
   const [latest, setLatest] = useState([]);
   const [bestSelling, setBestSelling] = useState([]);
   const [promotions, setPromotions] = useState([]);
+  const [mostViewed, setMostViewed] = useState([]);
   const [catalog, setCatalog] = useState({ items: [], pagination: { page: 1, totalPages: 1 } });
-  const [loading, setLoading] = useState({ latest: true, best: true, promo: true, catalog: true, categories: true });
-  const [error, setError] = useState({ latest: '', best: '', promo: '', catalog: '', categories: '' });
+  const [loading, setLoading] = useState({ latest: true, best: true, promo: true, mostViewed: true, catalog: true, categories: true });
+  const [error, setError] = useState({ latest: '', best: '', promo: '', mostViewed: '', catalog: '', categories: '' });
 
   const [filters, setFilters] = useState({
     categoryId: '',
@@ -47,27 +50,32 @@ const HomePage = () => {
 
   const loadLanding = async () => {
     try {
-      const [categoryRes, latestRes, bestRes, promoRes] = await Promise.all([
+      const [categoryRes, latestRes, bestRes, promoRes, viewedRes] = await Promise.all([
         fetchCategories(),
         fetchLatestProducts(6),
-        fetchBestSellingProducts(6),
-        fetchPromotionProducts(6)
+        fetchBestSellingProducts(10),
+        fetchPromotionProducts(6),
+        fetchMostViewedProducts(10)
       ]);
+      
       setCategories(categoryRes?.categories ?? []);
       setLatest(latestRes?.items ?? []);
       setBestSelling(bestRes?.items ?? []);
       setPromotions(promoRes?.items ?? []);
-      setError((prev) => ({ ...prev, latest: '', best: '', promo: '', categories: '' }));
+      setMostViewed(viewedRes?.items ?? []);
+      
+      setError((prev) => ({ ...prev, latest: '', best: '', promo: '', mostViewed: '', categories: '' }));
     } catch {
       setError((prev) => ({
         ...prev,
         latest: 'Unable to load latest products.',
         best: 'Unable to load best sellers.',
         promo: 'Unable to load promotions.',
-        categories: 'Unable to load categories.'
+        categories: 'Unable to load categories.',
+        mostViewed: 'Could not load most viewed products.'
       }));
     } finally {
-      setLoading((prev) => ({ ...prev, latest: false, best: false, promo: false, categories: false }));
+      setLoading((prev) => ({ ...prev, latest: false, best: false, promo: false, categories: false, mostViewed: false }));
     }
   };
 
@@ -167,17 +175,33 @@ const HomePage = () => {
           />
         </section>
 
+        {/* ĐÃ SỬA: Thay ProductGrid thành ProductCarousel để cuộn ngang */}
         <section id="best-sellers" className="section-shell space-y-8">
           <SectionHeader
             eyebrow="Best sellers"
             title="Shop the crowd favorites"
             description="Top-moving products based on real sales volume."
           />
-          <ProductGrid
+          <ProductCarousel
             items={bestSelling}
             isLoading={loading.best}
             error={error.best}
             emptyMessage="No best-selling products yet."
+          />
+        </section>
+
+        {/* THÊM MỚI: Mục Xem nhiều nhất (Most viewed) */}
+        <section id="most-viewed" className="section-shell space-y-8">
+          <SectionHeader
+            eyebrow="Most viewed"
+            title="Top 10 most viewed products"
+            description="Discover the products getting the most attention right now."
+          />
+          <ProductCarousel
+            items={mostViewed}
+            isLoading={loading.mostViewed}
+            error={error.mostViewed}
+            emptyMessage="No products viewed yet. Click on some products to see them here!"
           />
         </section>
 
