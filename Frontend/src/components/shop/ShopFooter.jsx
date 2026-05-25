@@ -5,7 +5,7 @@ const ShopFooter = () => {
         <div className="grid gap-8 md:grid-cols-[1.2fr_1fr_1fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">QuickCart</p>
-            <h3 className="mt-3 font-display text-2xl text-ink">Commerce Studio</h3>
+            <h3 className="mt-3 font-display text-2xl text-ink">Ecommerce shop</h3>
             <p className="mt-4 text-sm text-inkLight">
               A curated marketplace with real-time product data, handpicked for modern shoppers.
             </p>
@@ -20,11 +20,11 @@ const ShopFooter = () => {
             </ul>
           </div>
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Support</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Contact</p>
             <ul className="space-y-2 text-sm text-inkLight">
-              <li>help@quickcart.io</li>
-              <li>+1 222 112 4567</li>
-              <li>Mon - Sat · 08:00 - 22:00</li>
+              <li>Email: khoaduong861@gmail.com</li>
+              <li>Phone: +8422787915</li>
+              <li>Address: 1st Vo Van Ngan, Thu Duc District, HCM City</li>
             </ul>
           </div>
         </div>
